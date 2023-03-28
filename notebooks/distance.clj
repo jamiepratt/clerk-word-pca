@@ -1,7 +1,9 @@
 (ns distance 
   (:require [clojure.math.numeric-tower :as math]
             [clojure.java.io :as io]
-            [clojure.edn :as edn]))
+            [clojure.edn :as edn]
+            [nextjournal.clerk :as clerk]
+            [clojure.string :as str]))
 
 (defn euclidean-distance
   "Calculate the Euclidean distance between two vectors."
@@ -56,9 +58,15 @@
   "Compare the last word embedding to all other embeddings using the specified method (euclidean or cosine)."
   [embeddings method]
   (let [last-embedding (last embeddings)
-        other-embeddings (butlast embeddings)
+        other-embeddings embeddings
         distances (map #(word-embedding-distance last-embedding % method) other-embeddings)]
     distances))
+
+(def sentences
+  (->> "sentences2.txt"
+       io/resource
+       slurp
+       str/split-lines))
 
 ; Load embeddings from a file
 (def sentence-embeddings
@@ -71,5 +79,7 @@
 (def cosine-similarities (compare-embeddings sentence-embeddings :cosine))
 (def euclidean-distances (compare-embeddings sentence-embeddings :euclidean))
 
-(println "Cosine similarities:" cosine-similarities)
-(println "Euclidean distances:" euclidean-distances)
+(clerk/table
+ {:clerk/width :wide}
+ {:head ["Cosine similarities" "Euclidean distances"]
+  :rows (reverse (map list cosine-similarities euclidean-distances sentences))})
