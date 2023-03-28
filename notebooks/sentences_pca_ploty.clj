@@ -43,6 +43,8 @@
 (clerk/plotly 
  {:clerk/width :full
   :clerk/height 500}
- {:data [{:x x :y y :z z :type "scatter3d" :mode "markers"
-          :text sentences}]})
+ {:data [{:x x :y y :z z :type "scatter3d"
+          :text sentences
+          :mode "markers+text"
+          :textposition "middle right"}]})
 
