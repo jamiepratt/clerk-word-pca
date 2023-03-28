@@ -26,6 +26,7 @@
   ;; or call `clerk/show!` explicitly
   (clerk/show! "notebooks/words_pca_ploty.clj")
   (clerk/show! "notebooks/local_only/openai.clj")
+  (clerk/show! "notebooks/distance.clj")
 
   (clerk/show! "notebooks/sentences_pca_ploty.clj")
   (clerk/show! "notebooks/sentences2_pca_ploty.clj")
