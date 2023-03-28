@@ -1,0 +1,11 @@
+.calva/
+.clerk/
+.clj-kondo/
+.cpcache/
+.idea/
+.lsp/
+.nrepl-port
+jointprob-clerk.iml
+.DS_Store
+.portal/vs-code.edn
+public/build/index.html

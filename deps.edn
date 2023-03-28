@@ -1,0 +1,25 @@
+{:deps    {io.github.nextjournal/clerk           {:mvn/version "0.9.513"}
+           io.github.nextjournal/clerk-slideshow {:git/sha "82b3b83ca456995250bdb99deceb5a24fdd75439"}
+           aerial.hanami/aerial.hanami {:mvn/version "0.15.1"}
+           generateme/fastmath {:mvn/version "2.1.9-SNAPSHOT"
+                                :exclusions [com.github.haifengl/smile-mkl]}
+           org.clojure/data.csv {:mvn/version "1.0.1"}
+           kixi/stats {:mvn/version "0.5.5"}
+           incanter/incanter-core {:mvn/version "1.9.3"},
+           cheshire/cheshire {:mvn/version "5.11.0"},
+           clj-http/clj-http {:mvn/version "3.12.3"},
+           net.mikera/core.matrix {:mvn/version "0.63.0"}}
+ :paths   ["src" "notebooks" "data"]
+
+ :aliases {:nextjournal/clerk
+           {:exec-fn   nextjournal.clerk/build-static-app!
+            :git/url   "https://github.com/jamiepratt/jointprob-clerk"
+            :exec-args {:paths ["notebooks/*"] :bundle? true}}
+           :repl-server
+           {:exec-fn   clojure.core.server/start-server
+            :exec-args {:name          "repl-server"
+                        :port          5555
+                        :accept        clojure.core.server/repl
+                        :server-daemon false}}
+           :dev {:extra-paths ["dev"]}
+           :test {:extra-paths ["test"]}}}
