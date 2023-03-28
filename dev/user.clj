@@ -25,9 +25,10 @@
 
   ;; or call `clerk/show!` explicitly
   (clerk/show! "notebooks/words_pca_ploty.clj")
+  (clerk/show! "notebooks/local_only/openai.clj")
 
   (clerk/show! "notebooks/sentences_pca_ploty.clj")
-
+  (clerk/show! "notebooks/sentences2_pca_ploty.clj")
 
   (clerk/show! "index.md")
 
@@ -35,4 +36,5 @@
   ;; notebook with some implementation details.
   ;; (clerk/show! "notebooks/how_clerk_works.clj")
 
-  (clerk/build-static-app! {:paths ["notebooks/**"] :bundle? false}))
+  (clerk/build-static-app! {:paths ["notebooks/**"] :bundle? false})
+  )

@@ -7,5 +7,6 @@
 .nrepl-port
 jointprob-clerk.iml
 .DS_Store
-.portal/vs-code.edn
-public/build/index.html
+.portal/
+public/
+.envrc
