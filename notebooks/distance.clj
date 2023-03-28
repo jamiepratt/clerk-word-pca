@@ -1,9 +1,7 @@
 (ns distance 
   (:require [clojure.math.numeric-tower :as math]
-            [clojure.java.io :as io]
-            [clojure.edn :as edn]
             [nextjournal.clerk :as clerk]
-            [clojure.string :as str]))
+            [clerk-word-pca.files :as files]))
 
 (defn euclidean-distance
   "Calculate the Euclidean distance between two vectors."
@@ -45,24 +43,66 @@
   )
 
 
-(def sentences
-  (->> "sentences2.txt"
-       io/resource
-       slurp
-       str/split-lines))
+(defn distance-to-reference-embedding
+  "Calculate the distance between a sentence embedding and a reference embedding."
+  [method reference-embedding sentence-embeddings]
+  (map (partial method reference-embedding) sentence-embeddings))
 
 ; Load embeddings from a file
-(def sentence-embeddings
-  (->> "sentence-embeddings2.txt"
-       io/resource
-       slurp
-       edn/read-string))
+(def sentence-embeddings (files/get-edn-from-file "sentence-embeddings2.edn"))
 
-; Compare the last word embedding to all other embeddings using cosine similarity and Euclidean distance
-(def cosine-similarities (map (partial cosine-similarity (last sentence-embeddings)) sentence-embeddings))
-(def euclidean-distances (map (partial euclidean-distance (last sentence-embeddings)) sentence-embeddings ))
+; ## sentence-embeddings2.edn
 
 (clerk/table
  {:clerk/width :wide}
  {:head ["Cosine similarities" "Euclidean distances" "Sentences"]
-  :rows (reverse (map list cosine-similarities euclidean-distances sentences))})
+  :rows (mapv
+         vector
+         (distance-to-reference-embedding cosine-similarity
+                                          (last sentence-embeddings)
+                                          (reverse sentence-embeddings))
+         (distance-to-reference-embedding euclidean-distance
+                                          (last sentence-embeddings)
+                                          (reverse sentence-embeddings))
+         (reverse (files/get-lines-from-file "sentences2.txt")))})
+
+; ## progressively disimilar sentences
+
+(def progressively-dissimilar-sentences-embeddings 
+  (files/get-edn-from-file "progressively-dissimilar-sentences-embeddings.edn"))
+
+
+(def progressively-dissimilar-sentences
+  (files/get-lines-from-file "progressively-dissimilar-sentences.txt"))
+
+(clerk/table
+ {:clerk/width :wide}
+ {:head ["Cosine similarities" "Euclidean distances" "Sentences"]
+  :rows (mapv
+         vector
+         (distance-to-reference-embedding cosine-similarity
+                                          (first progressively-dissimilar-sentences-embeddings)
+                                          progressively-dissimilar-sentences-embeddings)
+         (distance-to-reference-embedding euclidean-distance
+                                          (first progressively-dissimilar-sentences-embeddings)
+                                          progressively-dissimilar-sentences-embeddings)
+         progressively-dissimilar-sentences)})
+
+(def progressively-dissimilar-sentences-embeddings2
+  (files/get-edn-from-file "progressively-dissimilar-sentences-embeddings2.edn"))
+
+(def progressively-dissimilar-sentences2
+  (files/get-lines-from-file "progressively-dissimilar-sentences2.txt"))
+
+(clerk/table
+ {:clerk/width :wide}
+ {:head ["Cosine similarities" "Euclidean distances" "Sentences"]
+  :rows (mapv
+         vector
+         (distance-to-reference-embedding cosine-similarity
+                                          (first progressively-dissimilar-sentences-embeddings2)
+                                          progressively-dissimilar-sentences-embeddings2)
+         (distance-to-reference-embedding euclidean-distance
+                                          (first progressively-dissimilar-sentences-embeddings2)
+                                          progressively-dissimilar-sentences-embeddings2)
+         progressively-dissimilar-sentences2)})

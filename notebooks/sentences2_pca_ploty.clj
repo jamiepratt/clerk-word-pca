@@ -5,9 +5,7 @@
             [incanter.core :as incanter]
             [incanter.stats :as stats]
             [clojure.core.matrix :as m]
-            [clojure.java.io :as io]
-            [clojure.edn :as edn]
-            [clojure.string :as str]))
+            [clerk-word-pca.files :as files]))
 
 
 
@@ -18,18 +16,10 @@
 ;; # Example of performing PCA on word and sentence embedding data
 
 
-(def sentence-embeddings
-  (->> "sentence-embeddings2.txt"
-       io/resource
-       slurp
-       edn/read-string))
 
-(def sentences
-  (->> "sentences2.txt"
-      io/resource
-      slurp
-      str/split-lines))
+(def sentence-embeddings (files/get-edn-from-file "sentence-embeddings2.edn"))
 
+(def sentences (files/get-lines-from-file "sentences2.txt"))
 
 (def pca (stats/principal-components sentence-embeddings))
 (def components (:rotation pca))

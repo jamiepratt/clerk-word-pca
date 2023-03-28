@@ -5,7 +5,7 @@
 .idea/
 .lsp/
 .nrepl-port
-jointprob-clerk.iml
+*.iml
 .DS_Store
 .portal/
 public/

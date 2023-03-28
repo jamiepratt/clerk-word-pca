@@ -18,7 +18,7 @@
 
 
 (def word-embeddings
-  (->> "word-embeddings.txt"
+  (->> "word-embeddings.edn"
        io/resource
        slurp
        edn/read-string))

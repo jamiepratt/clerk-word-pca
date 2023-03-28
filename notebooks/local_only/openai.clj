@@ -1,8 +1,7 @@
 (ns local-only.openai
   (:require [cheshire.core :as json]
             [clj-http.client :as http]
-            [clojure.string :as str]
-            [clojure.java.io :as io]))
+            [clerk-word-pca.files :as files]))
 
 
 (def default-params
@@ -26,22 +25,21 @@
       {:success true :resp resp}
       {:success false :resp resp})))
 
-(def sentences 
-  (-> "sentences.txt"
-      io/resource
-      slurp
-      str/split-lines
-      vec))
 
-sentences
+(defn get-embeddings [sentences]
+  (as-> sentences $
+    {:input $}
+    (request $)
+    (:resp $)
+    (:body $)
+    (json/parse-string $ keyword)
+    (:data $)
+    (mapv :embedding $)))
+(comment
 
-(def api-results (request {:input sentences}))
 
-(def embeddings (-> api-results
-                    :resp
-                    :body
-                    (json/parse-string keyword)
-                    :data
-                    ((partial mapv :embedding))))
-
-(spit "sentence-embeddings2.txt" (pr-str embeddings))
+  (spit "sentence-embeddings.edn" (pr-str (get-embeddings (files/get-lines-from-file "sentences.txt"))))
+  (spit "sentence-embeddings2.edn" (pr-str (get-embeddings (files/get-lines-from-file "sentences2.txt"))))
+  (spit "progressively-dissimilar-sentences-embeddings.edn" (pr-str (get-embeddings (files/get-lines-from-file "progressively-dissimilar-sentences.txt"))))
+  (spit "progressively-dissimilar-sentences-embeddings2.edn" (pr-str (get-embeddings (files/get-lines-from-file "progressively-dissimilar-sentences2.txt"))))
+  )
