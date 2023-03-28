@@ -21,25 +21,16 @@
 (defn magnitude
   "Calculate the magnitude of a vector."
   [vector]
-  (->> (map #(math/expt % 2) vector)
-       (reduce +)
-       (math/sqrt)))
+  (->>
+   vector
+   (reduce #(+ (math/expt %2 2) %1) 0)
+   (math/sqrt)))
 
 (defn cosine-similarity
   "Calculate the cosine similarity between two vectors."
   [vector-a vector-b]
-  (let [dot-product (dot-product vector-a vector-b)
-        magnitude-a (magnitude vector-a)
-        magnitude-b (magnitude vector-b)]
-    (/ dot-product (* magnitude-a magnitude-b))))
+  (/ (dot-product vector-a vector-b) (* (magnitude vector-a) (magnitude vector-b))))
 
-(defn word-embedding-distance
-  "Find the distance between two word embedding vectors using the specified method (euclidean or cosine)."
-  [vector-a vector-b method]
-  (cond
-    (= method :euclidean) (euclidean-distance vector-a vector-b)
-    (= method :cosine) (cosine-similarity vector-a vector-b)
-    :else (throw (IllegalArgumentException. "Invalid distance method"))))
 
 (comment 
 ;; ; Example usage
@@ -48,19 +39,11 @@
   (def vector-2 [4.0 5.0 6.0])
   
 
-  (println "Euclidean distance:" (word-embedding-distance vector-1 vector-2 :euclidean))
+  (println "Euclidean distance:" (euclidean-distance vector-1 vector-2))
   
-  (println "Cosine similarity:" (word-embedding-distance vector-1 vector-2 :cosine))
+  (println "Cosine similarity:" (cosine-similarity vector-1 vector-2))
   )
 
-
-(defn compare-embeddings
-  "Compare the last word embedding to all other embeddings using the specified method (euclidean or cosine)."
-  [embeddings method]
-  (let [last-embedding (last embeddings)
-        other-embeddings embeddings
-        distances (map #(word-embedding-distance last-embedding % method) other-embeddings)]
-    distances))
 
 (def sentences
   (->> "sentences2.txt"
@@ -76,10 +59,10 @@
        edn/read-string))
 
 ; Compare the last word embedding to all other embeddings using cosine similarity and Euclidean distance
-(def cosine-similarities (compare-embeddings sentence-embeddings :cosine))
-(def euclidean-distances (compare-embeddings sentence-embeddings :euclidean))
+(def cosine-similarities (map (partial cosine-similarity (last sentence-embeddings)) sentence-embeddings))
+(def euclidean-distances (map (partial euclidean-distance (last sentence-embeddings)) sentence-embeddings ))
 
 (clerk/table
  {:clerk/width :wide}
- {:head ["Cosine similarities" "Euclidean distances"]
+ {:head ["Cosine similarities" "Euclidean distances" "Sentences"]
   :rows (reverse (map list cosine-similarities euclidean-distances sentences))})
