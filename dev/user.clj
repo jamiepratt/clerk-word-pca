@@ -1,11 +1,23 @@
-(require '[nextjournal.clerk :as clerk])
+(ns user
+  (:require [nextjournal.clerk :as clerk]
+            [portal.api :as p]))
 
 ;; start Clerk's built-in webserver on the default port 7777, opening the browser when done
 (clerk/serve! {:watch-paths ["notebooks" "src"]})
 
-
+(defmacro t> [& expr]
+  `(let [start# (. System (nanoTime))
+         result# (do
+                   ~@expr)
+         end# (. System (nanoTime))
+         total-time# (/ (double (- end# start#)) 100000.0)]
+     (binding [*print-meta* true]
+       (tap> {:expr expr :t total-time# :returns return# :env &env}))
+     result#))
+(let [p (p/open)]
+  (add-tap #'p/submit)
+  p)
 (comment
-  (require '[nextjournal.clerk :as clerk])
   ;; to require tests:
   (require '[dbinomial-test])
   (clerk/serve! {:watch-paths ["notebooks" "src"]})
